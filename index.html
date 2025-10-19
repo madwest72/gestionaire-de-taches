@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionnaire de Tâches - BTS SIO SLAM</title>
+    <style>
+        /* Réinitialisation des marges et application d'une police moderne */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Conteneur principal de l'application */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+        }
+
+        /* En-tête de l'application */
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        /* Section de statistiques */
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        /* Formulaire d'ajout de tâche */
+        .input-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        #taskInput {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        #taskInput:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* Sélecteur de priorité */
+        #prioritySelect {
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        /* Bouton d'ajout */
+        button {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Filtres de tâches */
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Liste des tâches */
+        .tasks-list {
+            list-style: none;
+        }
+
+        /* Élément de tâche */
+        .task-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .task-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Tâche complétée */
+        .task-item.completed {
+            opacity: 0.6;
+            border-left-color: #4caf50;
+        }
+
+        .task-item.completed .task-text {
+            text-decoration: line-through;
+            color: #999;
+        }
+
+        /* Styles de priorité */
+        .task-item.priority-haute {
+            border-left-color: #f44336;
+        }
+
+        .task-item.priority-moyenne {
+            border-left-color: #ff9800;
+        }
+
+        .task-item.priority-basse {
+            border-left-color: #4caf50;
+        }
+
+        /* Checkbox personnalisée */
+        .task-checkbox {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        /* Texte de la tâche */
+        .task-text {
+            flex: 1;
+            font-size: 16px;
+            color: #333;
+        }
+
+        /* Badge de priorité */
+        .priority-badge {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .priority-haute {
+            background: #ffebee;
+            color: #f44336;
+        }
+
+        .priority-moyenne {
+            background: #fff3e0;
+            color: #ff9800;
+        }
+
+        .priority-basse {
+            background: #e8f5e9;
+            color: #4caf50;
+        }
+
+        /* Bouton de suppression */
+        .delete-btn {
+            background: #f44336;
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+
+        .delete-btn:hover {
+            background: #d32f2f;
+        }
+
+        /* Message quand il n'y a pas de tâches */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>📋 Gestionnaire de Tâches</h1>
+
+        <!-- Section des statistiques -->
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-number" id="totalTasks">0</div>
+                <div class="stat-label">Total</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="completedTasks">0</div>
+                <div class="stat-label">Complétées</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="pendingTasks">0</div>
+                <div class="stat-label">En attente</div>
+            </div>
+        </div>
+
+        <!-- Formulaire d'ajout de tâche -->
+        <div class="input-section">
+            <input type="text" id="taskInput" placeholder="Ajouter une nouvelle tâche..." autocomplete="off">
+            <select id="prioritySelect">
+                <option value="basse">Priorité Basse</option>
+                <option value="moyenne" selected>Priorité Moyenne</option>
+                <option value="haute">Priorité Haute</option>
+            </select>
+            <button onclick="addTask()">Ajouter</button>
+        </div>
+
+        <!-- Filtres -->
+        <div class="filters">
+            <button class="filter-btn active" onclick="filterTasks('all')">Toutes</button>
+            <button class="filter-btn" onclick="filterTasks('pending')">En attente</button>
+            <button class="filter-btn" onclick="filterTasks('completed')">Complétées</button>
+        </div>
+
+        <!-- Liste des tâches -->
+        <ul class="tasks-list" id="tasksList"></ul>
+    </div>
+
+    <script>
+        // Déclaration des variables globales
+        let tasks = []; // Tableau pour stocker toutes les tâches
+        let currentFilter = 'all'; // Filtre actuel (toutes, en attente, complétées)
+
+        // Fonction d'initialisation au chargement de la page
+        function init() {
+            // Récupération des tâches sauvegardées dans le localStorage
+            const savedTasks = localStorage.getItem('tasks');
+            if (savedTasks) {
+                // Si des tâches existent, on les parse (conversion JSON vers objet JS)
+                tasks = JSON.parse(savedTasks);
+            }
+            // Affichage initial des tâches
+            renderTasks();
+
+            // Ajout d'un écouteur d'événement pour la touche Entrée
+            document.getElementById('taskInput').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    addTask();
+                }
+            });
+        }
+
+        // Fonction pour ajouter une nouvelle tâche
+        function addTask() {
+            const input = document.getElementById('taskInput');
+            const taskText = input.value.trim(); // Suppression des espaces inutiles
+            const priority = document.getElementById('prioritySelect').value;
+
+            // Vérification que le champ n'est pas vide
+            if (taskText === '') {
+                alert('Veuillez entrer une tâche !');
+                return;
+            }
+
+            // Création d'un objet tâche avec toutes ses propriétés
+            const task = {
+                id: Date.now(), // Utilisation du timestamp comme ID unique
+                text: taskText,
+                completed: false,
+                priority: priority,
+                createdAt: new Date().toLocaleString('fr-FR')
+            };
+
+            // Ajout de la tâche au début du tableau
+            tasks.unshift(task);
+
+            // Sauvegarde dans le localStorage (stockage local du navigateur)
+            saveTasks();
+
+            // Réinitialisation du champ de saisie
+            input.value = '';
+
+            // Mise à jour de l'affichage
+            renderTasks();
+        }
+
+        // Fonction pour basculer l'état d'une tâche (complétée/non complétée)
+        function toggleTask(id) {
+            // Recherche de la tâche par son ID
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                // Inversion de l'état completed
+                task.completed = !task.completed;
+                saveTasks();
+                renderTasks();
+            }
+        }
+
+        // Fonction pour supprimer une tâche
+        function deleteTask(id) {
+            // Confirmation avant suppression
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette tâche ?')) {
+                // Filtrage du tableau pour exclure la tâche à supprimer
+                tasks = tasks.filter(t => t.id !== id);
+                saveTasks();
+                renderTasks();
+            }
+        }
+
+        // Fonction pour filtrer les tâches affichées
+        function filterTasks(filter) {
+            currentFilter = filter;
+
+            // Mise à jour visuelle des boutons de filtre
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            renderTasks();
+        }
+
+        // Fonction pour sauvegarder les tâches dans le localStorage
+        function saveTasks() {
+            // Conversion du tableau en JSON pour le stockage
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+        // Fonction principale pour afficher les tâches
+        function renderTasks() {
+            const tasksList = document.getElementById('tasksList');
+
+            // Filtrage des tâches selon le filtre actif
+            let filteredTasks = tasks;
+            if (currentFilter === 'completed') {
+                filteredTasks = tasks.filter(t => t.completed);
+            } else if (currentFilter === 'pending') {
+                filteredTasks = tasks.filter(t => !t.completed);
+            }
+
+            // Si aucune tâche, affichage d'un message
+            if (filteredTasks.length === 0) {
+                tasksList.innerHTML = '<div class="empty-state">📝 Aucune tâche à afficher</div>';
+            } else {
+                // Génération du HTML pour chaque tâche
+                tasksList.innerHTML = filteredTasks.map(task => `
+                    <li class="task-item ${task.completed ? 'completed' : ''} priority-${task.priority}">
+                        <input 
+                            type="checkbox" 
+                            class="task-checkbox"
+                            ${task.completed ? 'checked' : ''}
+                            onchange="toggleTask(${task.id})"
+                        >
+                        <span class="task-text">${task.text}</span>
+                        <span class="priority-badge priority-${task.priority}">
+                            ${task.priority.toUpperCase()}
+                        </span>
+                        <button class="delete-btn" onclick="deleteTask(${task.id})">
+                            Supprimer
+                        </button>
+                    </li>
+                `).join('');
+            }
+
+            // Mise à jour des statistiques
+            updateStats();
+        }
+
+        // Fonction pour mettre à jour les statistiques affichées
+        function updateStats() {
+            const total = tasks.length;
+            const completed = tasks.filter(t => t.completed).length;
+            const pending = total - completed;
+
+            document.getElementById('totalTasks').textContent = total;
+            document.getElementById('completedTasks').textContent = completed;
+            document.getElementById('pendingTasks').textContent = pending;
+        }
+
+        // Appel de la fonction d'initialisation au chargement de la page
+        window.onload = init;
+    </script>
+</body>
+</html>
