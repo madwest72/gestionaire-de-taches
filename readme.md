@@ -23,9 +23,6 @@ Application web de gestion de tâches avec système de priorités et filtres.
 2. Ouvrez-le dans votre navigateur
 3. Commencez à ajouter vos tâches !
 
-## 📸 Aperçu
-
-![Gestionnaire de Tâches](screenshot.png)
 
 ## 👨‍💻 Auteur
 
